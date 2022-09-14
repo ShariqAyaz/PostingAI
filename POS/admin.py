@@ -3,8 +3,6 @@ from socket import fromshare
 from django.contrib import admin
 from django.db import models
 from .models import Menuitems, Recipeitems, Recipes, Inventoryitems, Inventorytransactiondocuments, Inventorytransactions, Menuitemportions, Menuitemprices
-from django import forms
-
 
 
 class MultiDBModelAdmin(admin.ModelAdmin):

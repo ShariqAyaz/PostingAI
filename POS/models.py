@@ -1,3 +1,4 @@
+
 from django.db import models
 
 
@@ -661,11 +662,16 @@ class Menuitemprices(models.Model):
     pricetag = models.CharField(db_column='PriceTag', max_length=10, blank=True, null=True)  # Field name made lowercase.
     price = models.DecimalField(db_column='Price', max_digits=16, decimal_places=2)  # Field name made lowercase.
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'MenuItemPrices'
         unique_together = (('id', 'menuitemportionid'),)
-
+        verbose_name = 'Menu Item Price'
+        verbose_name_plural = 'Menu Items Prices'
+        
 
 class Menuitems(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
@@ -674,9 +680,15 @@ class Menuitems(models.Model):
     tag = models.TextField(db_column='Tag', blank=True, null=True)  # Field name made lowercase.
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'MenuItems'
+        verbose_name = 'Menu Item'
+        verbose_name_plural = 'Menu Items'
+        
 
 
 class Numerators(models.Model):
@@ -686,9 +698,14 @@ class Numerators(models.Model):
     numberformat = models.TextField(db_column='NumberFormat', blank=True, null=True)  # Field name made lowercase.
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
 
+    def __str__(self) -> str:
+        return self.lastupdatetime + name
+
     class Meta:
         managed = False
         db_table = 'Numerators'
+        verbose_name = 'Numerator'
+        verbose_name_plural = 'Numerator'
 
 
 class Ordertaggroups(models.Model):
@@ -711,7 +728,6 @@ class Ordertaggroups(models.Model):
     class Meta:
         managed = False
         db_table = 'OrderTagGroups'
-
 
 class Ordertagmaps(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
