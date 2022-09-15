@@ -513,6 +513,9 @@ class Entitytypeassignments(models.Model):
     copytonewtickets = models.BooleanField(db_column='CopyToNewTickets')  # Field name made lowercase.
     sortorder = models.IntegerField(db_column='SortOrder')  # Field name made lowercase.
 
+    def __str__(self):
+        return self.entitytypename
+
     class Meta:
         managed = False
         db_table = 'EntityTypeAssignments'
@@ -557,6 +560,9 @@ class Inventoryitems(models.Model):
     transactionunitmultiplier = models.IntegerField(db_column='TransactionUnitMultiplier')  # Field name made lowercase.
     warehouse = models.TextField(db_column='Warehouse', blank=True, null=True)  # Field name made lowercase.
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         managed = False
@@ -641,6 +647,9 @@ class Menuitemportions(models.Model):
     menuitemid = models.ForeignKey('Menuitems', models.DO_NOTHING, db_column='MenuItemId')  # Field name made lowercase.
     multiplier = models.IntegerField(db_column='Multiplier')  # Field name made lowercase.
 
+    def __str__(self):
+        return self.name +  ' -> ' + str(self.menuitemid)
+
     class Meta:
         managed = False
         db_table = 'MenuItemPortions'
@@ -662,8 +671,8 @@ class Menuitemprices(models.Model):
     pricetag = models.CharField(db_column='PriceTag', max_length=10, blank=True, null=True)  # Field name made lowercase.
     price = models.DecimalField(db_column='Price', max_digits=16, decimal_places=2)  # Field name made lowercase.
 
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return self.menuitemportionid
 
     class Meta:
         managed = False
@@ -680,7 +689,7 @@ class Menuitems(models.Model):
     tag = models.TextField(db_column='Tag', blank=True, null=True)  # Field name made lowercase.
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -728,6 +737,7 @@ class Ordertaggroups(models.Model):
     class Meta:
         managed = False
         db_table = 'OrderTagGroups'
+
 
 class Ordertagmaps(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.

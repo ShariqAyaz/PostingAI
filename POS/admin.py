@@ -34,6 +34,8 @@ class MultiDBModelAdmin(admin.ModelAdmin):
 
 class RecipeitemsAdminTab(admin.TabularInline):
     using = 'SambaPOS3'
+    
+
     def get_queryset(self, request):
         # Tell Django to look for inline objects on the 'other' database.
         return super().get_queryset(request).using(self.using)
@@ -51,12 +53,15 @@ class RecipeitemsAdminTab(admin.TabularInline):
 
 class RecipeitemsAdmin(RecipeitemsAdminTab):
     model = Recipeitems
-
+    save_as = True
+    
 
 class RecipesAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
     using = 'SambaPOS3'
     inlines = [RecipeitemsAdmin,]
+    save_as = True
+    list_display = ['name','portion','fixedcost']
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.
@@ -79,8 +84,6 @@ class RecipesAdmin(admin.ModelAdmin):
         # Tell Django to populate ManyToMany widgets using a query
         # on the 'other' database.
         return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
-
-
 
 
 admin.site.register(Menuitems,MultiDBModelAdmin)

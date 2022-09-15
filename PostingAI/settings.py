@@ -84,18 +84,6 @@ DATABASES = {
             'driver': 'ODBC Driver 17 for SQL Server',
         },
     },
-        'ESITERP': {
-        'ENGINE': 'mssql',
-        'NAME': 'ESITERP',
-        'USER': 'sa',
-        'PASSWORD': 'abc.123',
-        'HOST': 'DESKTOP-7H23HPS\SQLEXPRESS',
-        'PORT': '1433',
-        'Trusted_Connection':'no',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
 }
 
 
