@@ -54,7 +54,7 @@ class RecipeitemsAdminTab(admin.TabularInline):
 class RecipeitemsAdmin(RecipeitemsAdminTab):
     model = Recipeitems
     save_as = True
-    
+
 
 class RecipesAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
