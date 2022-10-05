@@ -55,7 +55,7 @@ class MaterialMaster(models.Model):
     divisibleUOM = models.DecimalField(max_digits=18, decimal_places=2, help_text='For example: Convert from Purchase to Consume unit.In which Unit of Measure material will consume. Further, if bough box of 24pcs, so 24 will be assign here, if consume in box. if each box having item in Kgs, then 24xWeight of each Pcs within carton')
     
     def __str__(self):
-        return f"{self.name} UOP: {self.UOP}"
+        return f"{self.name}, UOP: {self.UOP}"
     
     class Meta:
         unique_together = (('name', 'internalName'),('internalName','UOC'))
@@ -81,7 +81,7 @@ class PaymentMethods(models.Model):
     name = models.CharField(max_length=50,default='Cash', unique=True, verbose_name='Owner/Holder Name', help_text='i.e(Shariq Halifax, MPhenom NatWest, Rasa Cash, TripleOne Cash)')
 
     def __str__(self):
-        return f"{self.cardEnding} {self.name}"
+        return f"{self.cardEnding}, {self.name}"
 ###############
 # Payment   > #
 ###############
@@ -99,16 +99,16 @@ class GrnNote(models.Model):
     time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
 
     def __str__(self):
-        return f"{self.pk} {self.invoiceNumber} {self.vendorName} {self.date}" 
+        return f"{self.pk}, {self.invoiceNumber}, {self.vendorName}, {self.date}" 
 
 class GrnItemsDet(models.Model):
     grn_no = models.ForeignKey('GrnNote', models.DO_NOTHING)
     itemName = models.ForeignKey('MaterialMaster', models.DO_NOTHING)
-    irate = models.DecimalField(max_digits=18, decimal_places=4)
-    iqty = models.DecimalField(max_digits=18, decimal_places=4)
+    irate = models.DecimalField(max_digits=18, decimal_places=2)
+    iqty = models.DecimalField(max_digits=18, decimal_places=2)
 
     def __str__(self):
-        return f"{self.grn_no} {self.itemName}" 
+        return f"{self.grn_no}, {self.itemName}" 
 #############################
 # GRN - Good Receipt Note > #
 #############################
@@ -130,8 +130,8 @@ class Store(models.Model):
 class StoreDet(models.Model):
     doc = models.ForeignKey(Store, models.DO_NOTHING)
     itemName = models.ForeignKey('MaterialMaster', models.DO_NOTHING)
-    increase_qty = models.DecimalField(max_digits=18, decimal_places=4)
-    decrease_qty = models.DecimalField(max_digits=18, decimal_places=4)
+    increase_qty = models.DecimalField(max_digits=18, decimal_places=2)
+    decrease_qty = models.DecimalField(max_digits=18, decimal_places=2)
 
 ###########################
 # Store Stock Warehouse > #
