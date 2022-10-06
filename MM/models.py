@@ -81,7 +81,7 @@ class PaymentMethods(models.Model):
     name = models.CharField(max_length=50,default='Cash', unique=True, verbose_name='Owner/Holder Name', help_text='i.e(Shariq Halifax, MPhenom NatWest, Rasa Cash, TripleOne Cash)')
 
     def __str__(self):
-        return f"{self.cardEnding}, {self.name}"
+        return self.name
 ###############
 # Payment   > #
 ###############
@@ -99,7 +99,7 @@ class GrnNote(models.Model):
     time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
 
     def __str__(self):
-        return f"{self.pk}, {self.invoiceNumber}, {self.vendorName}, {self.date}" 
+        return f"{self.pk}, {self.paymentMethod}, {self.invoiceNumber}, {self.vendorName}, {self.date}" 
 
 class GrnItemsDet(models.Model):
     grn_no = models.ForeignKey('GrnNote', models.DO_NOTHING)
