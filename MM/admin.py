@@ -23,11 +23,9 @@ class GrnDetAdmin(admin.ModelAdmin):
         current_grn = (sender.objects.get(id=instance.id))
 
         if instance.id != None:
-            print('none id')
             print('Instance id: ' + str(instance.id))
 
             if created:
-                
                 if current_grn.isPosted == True:
                     print('NEW\nPosted Marked ' + str(True))
                 else:
@@ -36,9 +34,6 @@ class GrnDetAdmin(admin.ModelAdmin):
             else:
                 print(current_grn.isPosted)
                 
-                print('\n')
-                print('UPDATED?\n')
-
                 if current_grn.isPosted == True:
                     print('UPDATED\nPosted Marked ' + str(True))
                 else:
