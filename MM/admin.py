@@ -18,44 +18,33 @@ class GrnDetAdmin(admin.ModelAdmin):
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
 
     @receiver(post_save, sender=GrnNote)
-    def my_handler(sender, created, **kwargs):
+    def my_handler(sender, created, instance, **kwargs):
 
-        if created:
-            last_grn = (sender.objects.last())
-            pm = PaymentMethods.objects.get(name=last_grn.paymentMethod)
+        current_grn = (sender.objects.get(id=instance.id))
 
-            # IF isPosted True checked at the Update event
-            if True:
-                print(True)
-            # IF isPosted False checked at the Update event
+        if instance.id != None:
+            print('none id')
+            print('Instance id: ' + str(instance.id))
+
+            if created:
+                
+                if current_grn.isPosted == True:
+                    print('NEW\nPosted Marked ' + str(True))
+                else:
+                    print('NEW\nNot Posted Marked ' + str(False))
+
             else:
-                print(False)
+                print(current_grn.isPosted)
+                
+                print('\n')
+                print('UPDATED?\n')
 
-            print(pm.id)
-            print(last_grn)
-            
-            # for k in last_grn:
-            #     pm = PaymentMethods.objects.filter(name=k.paymentMethod)
-            #     print(pm)
-        else:
-            print('UPDATED?\n')
+                if current_grn.isPosted == True:
+                    print('UPDATED\nPosted Marked ' + str(True))
+                else:
+                    print('UPDATED\nNot Posted Marked ' + str(False))
 
-            # IF isPosted True checked at the Update event
-            if True:
-                print(True)
-            # IF isPosted False checked at the Update event
-            else:
-                print(False)
 
-    # @receiver(post_save, sender=GrnItemsDet)
-    # def my_handler(sender, **kwargs):
-    #     last_grn = (sender.objects.last())
-    #     #pm = PaymentMethods.objects.get(name=last_grn.paymentMethod)
-    #     #print(pm.id)
-    #     print(last_grn)
-    #     # for k in last_grn:
-    #     #     pm = PaymentMethods.objects.filter(name=k.paymentMethod)
-    #     #     print(pm)
 
 admin.site.register(PaymentMethods)
 admin.site.register(Warehouse)
