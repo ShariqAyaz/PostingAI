@@ -4,6 +4,8 @@ from urllib.parse import urlencode
 from django.contrib import admin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
+from datetime import datetime, timedelta
 from .models import GrnItemsDet, PaymentMethods, Warehouse, MaterialMaster, MaterialType, GrnNote, Store, StoreDet
 
 
@@ -62,10 +64,11 @@ class GrnNoteAdmin(admin.ModelAdmin):
                     # Posting first time: 'Store' , 'StoreDet'
                     else:
 
+                        print('\t\nNot in Store? not matched with instance id and doctype GRN\n')
+                        print('Storing...\n')
                         # Storing for the first time
                         Store.objects.create(ref_doc_no=current_grn.id,docType='GRN',doc_date=current_grn.date)
-
-                        print('Not in Store? not matched with instance id and doctype GRN')
+                        print('Stored\n')
 
                 else:
 

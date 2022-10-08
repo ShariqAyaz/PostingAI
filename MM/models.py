@@ -93,7 +93,7 @@ class GrnNote(models.Model):
     invoiceNumber = models.CharField(max_length=50, verbose_name='Supplier / Vendor Invoice number')
     paymentMethod = models.ForeignKey('PaymentMethods', models.DO_NOTHING)
     vendorName = models.CharField(max_length=60, verbose_name='Supplier/Vendor Name')
-    date = models.DateField(verbose_name="Date of Invoice")
+    date = models.DateTimeField(verbose_name="Date of Invoice")
     isPosted = models.BooleanField(default=False)
     note = models.CharField(max_length=100, blank=True, null=False, default='N/A')
     time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
