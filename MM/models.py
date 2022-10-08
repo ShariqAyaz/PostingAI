@@ -99,7 +99,7 @@ class GrnNote(models.Model):
     time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
 
     def __str__(self):
-        return f"{self.pk}, {self.paymentMethod}, {self.invoiceNumber}, {self.vendorName}, {self.date}" 
+        return f"{self.pk}" 
 
 class GrnItemsDet(models.Model):
     grn_no = models.ForeignKey('GrnNote', models.DO_NOTHING)
@@ -108,7 +108,7 @@ class GrnItemsDet(models.Model):
     iqty = models.DecimalField(max_digits=18, decimal_places=2)
 
     def __str__(self):
-        return f"{self.grn_no}, {self.itemName}" 
+        return f"{self.grn_no}"
 #############################
 # GRN - Good Receipt Note > #
 #############################
