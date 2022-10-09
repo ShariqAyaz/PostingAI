@@ -33,16 +33,11 @@ class GrnNoteAdmin(admin.ModelAdmin):
     ]
 
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
-    
-         
+
     @receiver(post_save, sender=GrnNote)
     def post_handler(sender, created, instance, *args, **kwargs):
-
-        obj_compare = sender.objects.get(id=instance.id)
-
         print('\nPost Save')
         print(instance.id)
-        print(obj_compare.isPosted)
         
         current_grn = (sender.objects.get(id=instance.id))
 
@@ -52,28 +47,23 @@ class GrnNoteAdmin(admin.ModelAdmin):
 
             if created:
                 if current_grn.isPosted == True:
-                    Store.objects.create(ref_doc_no=current_grn.id,docType='GRN',doc_date=current_grn.date)
-
+                    Store.objects.create(ref_doc_no=current_grn.id, docType='GRN', doc_date=current_grn.date)
                     print('NEW\nPosted Marked ' + str(True))
                 else:
                     print('NEW\nNot Posted Marked ' + str(False))
-
             else:
                 if current_grn.isPosted == True:
                     print('UPDATED\nPosted Marked ' + str(True))
-                    
                     # Posting after unposting old data: 'Store' , 'StoreDet'
                     if Store.objects.filter(ref_doc_no=current_grn.id,docType='GRN').count() > 0:
                         print('Found in Store? matched with instance and doctype GRN')
                     # Posting first time: 'Store' , 'StoreDet'
                     else:
-
                         print('\t\nNot in Store? not matched with instance id and doctype GRN\n')
                         print('Storing...\n')
                         # Storing for the first time
                         Store.objects.create(ref_doc_no=current_grn.id,docType='GRN',doc_date=current_grn.date)
                         print('Stored\n')
-
                 else:
                     if Store.objects.filter(ref_doc_no=current_grn.id,docType='GRN').count() > 0:
                         print('unposting from Store and StoreDet...')
