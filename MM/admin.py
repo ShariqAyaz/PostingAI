@@ -1,8 +1,6 @@
-from asyncio import format_helpers
-from audioop import reverse
-from urllib.parse import urlencode
+from django.dispatch import Signal, receiver
 from django.contrib import admin
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete, pre_save 
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -35,18 +33,25 @@ class GrnNoteAdmin(admin.ModelAdmin):
     ]
 
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
-
+    
+         
     @receiver(post_save, sender=GrnNote)
-    def my_handler(sender, created, instance, **kwargs):
+    def post_handler(sender, created, instance, *args, **kwargs):
 
+        obj_compare = sender.objects.get(id=instance.id)
+
+        print('\nPost Save')
+        print(instance.id)
+        print(obj_compare.isPosted)
+        
         current_grn = (sender.objects.get(id=instance.id))
 
         if instance.id != None:
+            print('\n')
             print('Instance id: ' + str(instance.id))
 
             if created:
                 if current_grn.isPosted == True:
-                    
                     Store.objects.create(ref_doc_no=current_grn.id,docType='GRN',doc_date=current_grn.date)
 
                     print('NEW\nPosted Marked ' + str(True))
@@ -54,7 +59,6 @@ class GrnNoteAdmin(admin.ModelAdmin):
                     print('NEW\nNot Posted Marked ' + str(False))
 
             else:
-
                 if current_grn.isPosted == True:
                     print('UPDATED\nPosted Marked ' + str(True))
                     
@@ -71,12 +75,10 @@ class GrnNoteAdmin(admin.ModelAdmin):
                         print('Stored\n')
 
                 else:
-
                     if Store.objects.filter(ref_doc_no=current_grn.id,docType='GRN').count() > 0:
                         print('unposting from Store and StoreDet...')
 
                     print('UPDATED\nNot Posted Marked ' + str(False))
-
 
 admin.site.register(PaymentMethods)
 admin.site.register(Warehouse)

@@ -97,6 +97,10 @@ class GrnNote(models.Model):
     isPosted = models.BooleanField(default=False)
     note = models.CharField(max_length=100, blank=True, null=False, default='N/A')
     time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
+    
+    def __init__(self, *args, **kwargs):
+        super(GrnNote, self).__init__(*args, **kwargs)
+        self.__origin = self.id
 
     def __str__(self):
         return f"{self.pk}" 
