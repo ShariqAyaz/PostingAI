@@ -10,21 +10,29 @@ from .models import GrnItemsDet, PaymentMethods, Warehouse, MaterialMaster, Mate
 class GrnNoteInline(admin.TabularInline):
     model = GrnItemsDet
 
-# https://stackoverflow.com/questions/8541956/django-admin-add-extra-row-with-totals
+
 class GrnDetAdmin(admin.ModelAdmin):
     list_display = (
         'grn_no', 'itemName', 'irate', 'iqty', 'Amount'
     )
 
+    @receiver(post_save)
+    def post_handler(sender, created=False, instance=None, *args, **kwargs):
+        store_doc_no = None
+        cur_grn_no = None
+
+        if sender.__name__ == 'GrnItemsDet':
+
+            cur_grn_no = instance.grn_no
+            xx = str(cur_grn_no)
+            print(cur_grn_no)
+            print(xx)
+            store_doc_no = Store.objects.filter(ref_doc_no=xx).first()
+            StoreDet.objects.create(doc=store_doc_no, itemName=instance.itemName, increase_qty=instance.iqty, decrease_qty=0)
+            
+
     def Amount(self, obj):
          return 'obj.Amount'
-
-    # def get_queryset(self, request):
-    #     queryset = super().get_queryset(request)
-    #     queryset = queryset.annotate(
-    #         #_lineitem_amt=sum('irate'*'iqty')
-    #     )
-    #     return queryset
 
 
 class GrnNoteAdmin(admin.ModelAdmin):
@@ -34,41 +42,30 @@ class GrnNoteAdmin(admin.ModelAdmin):
 
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
 
-    @receiver(post_save, sender=GrnNote)
-    def post_handler(sender, created, instance, *args, **kwargs):
-        print('\nPost Save')
-        print(instance.id)
+    @receiver(post_save)
+    def post_handler(sender, created=False, instance=None, *args, **kwargs):
         
-        current_grn = (sender.objects.get(id=instance.id))
+        lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
 
-        if instance.id != None:
-            print('\n')
-            print('Instance id: ' + str(instance.id))
+        if sender.__name__ in lst_models:
+            cur_grn_no = None
 
-            if created:
-                if current_grn.isPosted == True:
-                    Store.objects.create(ref_doc_no=current_grn.id, docType='GRN', doc_date=current_grn.date)
-                    print('NEW\nPosted Marked ' + str(True))
-                else:
-                    print('NEW\nNot Posted Marked ' + str(False))
-            else:
-                if current_grn.isPosted == True:
-                    print('UPDATED\nPosted Marked ' + str(True))
-                    # Posting after unposting old data: 'Store' , 'StoreDet'
-                    if Store.objects.filter(ref_doc_no=current_grn.id,docType='GRN').count() > 0:
-                        print('Found in Store? matched with instance and doctype GRN')
-                    # Posting first time: 'Store' , 'StoreDet'
+            if sender.__name__ == 'GrnNote':
+                current_grn_obj = (sender.objects.get(id=instance.id))
+                cur_grn_no = current_grn_obj.id
+                if created:
+                    if current_grn_obj.isPosted == True:
+                        store = Store.objects.create(ref_doc_no=cur_grn_no, docType='GRN', doc_date=current_grn_obj.date)
+                        store.save()
                     else:
-                        print('\t\nNot in Store? not matched with instance id and doctype GRN\n')
-                        print('Storing...\n')
-                        # Storing for the first time
-                        Store.objects.create(ref_doc_no=current_grn.id,docType='GRN',doc_date=current_grn.date)
-                        print('Stored\n')
-                else:
-                    if Store.objects.filter(ref_doc_no=current_grn.id,docType='GRN').count() > 0:
-                        print('unposting from Store and StoreDet...')
+                        print('GrnNote: On Update Event')
 
-                    print('UPDATED\nNot Posted Marked ' + str(False))
+
+class StoreDetAdmin(admin.ModelAdmin):
+    list_display = (
+        'doc','itemName','increase_qty','decrease_qty'
+        )
+        
 
 admin.site.register(PaymentMethods)
 admin.site.register(Warehouse)
@@ -76,3 +73,5 @@ admin.site.register(MaterialMaster)
 admin.site.register(MaterialType)
 admin.site.register(GrnNote,GrnNoteAdmin)
 admin.site.register(GrnItemsDet, GrnDetAdmin)
+admin.site.register(Store)
+admin.site.register(StoreDet, StoreDetAdmin)

@@ -52,10 +52,11 @@ class MaterialMaster(models.Model):
     type = models.ForeignKey('MaterialType', models.DO_NOTHING,null=False,verbose_name='Material Type',help_text='for example: Storing Tuna type is Meat, Seafood, and Poultry')
     UOP = models.CharField(max_length=25, choices=MEASURE_UNITS, unique=False, null=False, verbose_name='Unit of Measure Purchase')
     UOC = models.CharField(max_length=25, choices=MEASURE_UNITS, unique=False, null=False, verbose_name='Unit of Measure Consume', help_text='note: Unit of consume will be the unit used to store stock and to move inventory')
-    divisibleUOM = models.DecimalField(max_digits=18, decimal_places=2, help_text='For example: Convert from Purchase to Consume unit.In which Unit of Measure material will consume. Further, if bough box of 24pcs, so 24 will be assign here, if consume in box. if each box having item in Kgs, then 24xWeight of each Pcs within carton')
+    packingOf = models.DecimalField(max_digits=18, decimal_places=4, help_text='For example: Convert from Purchase to Consume unit.In which Unit of Measure material will consume. Further, if bough box of 24pcs, so 24 will be assign here, if consume in box. if each box having item in Kgs, then 24xWeight of each Pcs within carton')
+    unitSize = models.DecimalField(max_digits=18, decimal_places=4,help_text='Important: If Purchase unit and sale units are not same, than provide unit of consumtion quantity/weights')
     
     def __str__(self):
-        return f"{self.name}, UOP: {self.UOP}"
+        return f"{self.name}"
     
     class Meta:
         unique_together = (('name', 'internalName'),('internalName','UOC'))
@@ -108,8 +109,8 @@ class GrnNote(models.Model):
 class GrnItemsDet(models.Model):
     grn_no = models.ForeignKey('GrnNote', models.DO_NOTHING)
     itemName = models.ForeignKey('MaterialMaster', models.DO_NOTHING)
-    irate = models.DecimalField(max_digits=18, decimal_places=2)
-    iqty = models.DecimalField(max_digits=18, decimal_places=2)
+    irate = models.DecimalField(max_digits=18, decimal_places=4)
+    iqty = models.DecimalField(max_digits=18, decimal_places=4)
 
     def __str__(self):
         return f"{self.grn_no}"
@@ -131,11 +132,21 @@ class Store(models.Model):
     docType = models.CharField(max_length=15, choices=REF_DOC_TYPE, unique=False, null=False)
     doc_date = models.DateTimeField()
 
+    def __str__(self):
+        return f"{self.ref_doc_no}"
+    
+    class Meta:
+        unique_together = (('ref_doc_no', 'docType'),)
+
+
 class StoreDet(models.Model):
     doc = models.ForeignKey(Store, models.DO_NOTHING)
     itemName = models.ForeignKey('MaterialMaster', models.DO_NOTHING)
-    increase_qty = models.DecimalField(max_digits=18, decimal_places=2)
-    decrease_qty = models.DecimalField(max_digits=18, decimal_places=2)
+    increase_qty = models.DecimalField(max_digits=18, decimal_places=4)
+    decrease_qty = models.DecimalField(max_digits=18, decimal_places=4)
+
+    def __str__(self):
+        return f"{self.id}"
 
 ###########################
 # Store Stock Warehouse > #
