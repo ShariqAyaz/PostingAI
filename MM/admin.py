@@ -44,7 +44,7 @@ class GrnNoteAdmin(admin.ModelAdmin):
                         store = Store.objects.create(ref_doc_no=cur_grn_no, docType='GRN', doc_date=current_grn_obj.date)
                         store.save()
                     else:
-                        print('GrnNote: On Update Event')
+                        pass
 
             if sender.__name__ == 'GrnItemsDet':
                 obj = sender.objects.select_related('itemName').values('itemName__UOP','itemName__internalName','itemName__packingOf','itemName__unitSize','itemName__UOC').filter(itemName=instance.itemName).first()
@@ -52,11 +52,9 @@ class GrnNoteAdmin(admin.ModelAdmin):
                 unitSize = obj.get('itemName__unitSize')
                 qty_each = packing_of * unitSize
                 if created:
-                    print(instance.grn_no)
                     store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()    
                     StoreDet.objects.create(doc=store_doc_id, itemName=instance.itemName, increase_qty=instance.iqty*qty_each, decrease_qty=0)
                 else:
-                    print('GrnItemsDet: On Update Event')
                     store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
                     StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).update(increase_qty=instance.iqty*qty_each, decrease_qty=0)
 
@@ -73,13 +71,23 @@ class StoreDetAdmin(admin.ModelAdmin):
     list_display = (
         'doc','itemName','increase_qty','decrease_qty'
         )
+
+
+class StoreAdmin(admin.ModelAdmin):
+    list_display = (
+        'ref_doc_no', 'docType', 'doc_date'
+        )
         
+class MaterialMasterAdmin(admin.ModelAdmin):
+    list_display = (
+        'internalName', 'name', 'UOP', 'UOC', 'packingOf', 'unitSize'
+    )
 
 admin.site.register(PaymentMethods)
 admin.site.register(Warehouse)
-admin.site.register(MaterialMaster)
+admin.site.register(MaterialMaster, MaterialMasterAdmin)
 admin.site.register(MaterialType)
 admin.site.register(GrnNote,GrnNoteAdmin)
 admin.site.register(GrnItemsDet, GrnDetAdmin)
-admin.site.register(Store)
+admin.site.register(Store, StoreAdmin)
 admin.site.register(StoreDet, StoreDetAdmin)

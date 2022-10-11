@@ -44,6 +44,7 @@ MEASURE_UNITS = (
     ('Bottle','Bottle'),
 )
 
+
 class MaterialMaster(models.Model):
     name = models.CharField(max_length=255, unique=False, null=False,blank=False,verbose_name='Material Name')
     internalName = models.CharField(max_length=255, unique=False, null=False,blank=False,verbose_name='Material Internal Name', help_text='i.e (milk, egg, chicken, tuna) in respective unit')
