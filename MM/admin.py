@@ -26,7 +26,7 @@ class GrnNoteAdmin(admin.ModelAdmin):
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
 
     @receiver(post_save)
-    def post_handler(sender, created=False, instance=None, *args, **kwargs):
+    def post_handler(sender, created=False, deleted=False, instance=None, *args, **kwargs):
         
         lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
 
@@ -45,14 +45,28 @@ class GrnNoteAdmin(admin.ModelAdmin):
 
             if sender.__name__ == 'GrnItemsDet':
                 if created:
-                    print('created invoke')
                     print(instance.grn_no)
                     store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
                     StoreDet.objects.create(doc=store_doc_id, itemName=instance.itemName, increase_qty=instance.iqty, decrease_qty=0)
                 else:
                     print('GrnItemsDet: On Update Event')
-                    print('update invoke')
+                    store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
+                    StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).update(increase_qty=instance.iqty, decrease_qty=0)
 
+    @receiver(pre_delete)
+    def post_handler(sender, instance=None, *args, **kwargs):
+        
+        lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
+        if sender.__name__ in lst_models:
+            if sender.__name__ == 'GrnItemsDet':
+                store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
+                StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).delete()
+
+class StoreDetAdmin(admin.ModelAdmin):
+    list_display = (
+        'doc','itemName','increase_qty','decrease_qty'
+        )
+        
 
 admin.site.register(PaymentMethods)
 admin.site.register(Warehouse)
@@ -61,4 +75,4 @@ admin.site.register(MaterialType)
 admin.site.register(GrnNote,GrnNoteAdmin)
 admin.site.register(GrnItemsDet, GrnDetAdmin)
 admin.site.register(Store)
-admin.site.register(StoreDet)
+admin.site.register(StoreDet, StoreDetAdmin)
