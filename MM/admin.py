@@ -1,3 +1,6 @@
+from decimal import Decimal
+import numbers
+from unicodedata import decimal
 from django.dispatch import Signal, receiver
 from django.contrib import admin
 from django.db.models.signals import post_save, pre_delete, pre_save 
@@ -44,14 +47,18 @@ class GrnNoteAdmin(admin.ModelAdmin):
                         print('GrnNote: On Update Event')
 
             if sender.__name__ == 'GrnItemsDet':
+                obj = sender.objects.select_related('itemName').values('itemName__UOP','itemName__internalName','itemName__packingOf','itemName__unitSize','itemName__UOC').filter(itemName=instance.itemName).first()
+                packing_of = obj.get('itemName__packingOf')
+                unitSize = obj.get('itemName__unitSize')
+                qty_each = packing_of * unitSize
                 if created:
                     print(instance.grn_no)
-                    store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
-                    StoreDet.objects.create(doc=store_doc_id, itemName=instance.itemName, increase_qty=instance.iqty, decrease_qty=0)
+                    store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()    
+                    StoreDet.objects.create(doc=store_doc_id, itemName=instance.itemName, increase_qty=instance.iqty*qty_each, decrease_qty=0)
                 else:
                     print('GrnItemsDet: On Update Event')
                     store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
-                    StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).update(increase_qty=instance.iqty, decrease_qty=0)
+                    StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).update(increase_qty=instance.iqty*qty_each, decrease_qty=0)
 
     @receiver(pre_delete)
     def post_handler(sender, instance=None, *args, **kwargs):
