@@ -7,7 +7,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import GrnItemsDet, PaymentMethods, Warehouse, MaterialMaster, MaterialType, GrnNote, Store, StoreDet
+from .models import GrnItemsDet, PaymentMethods, Warehouse, InternalMaterial, MaterialMaster, MaterialType, GrnNote, Store, StoreDet
 
 
 class GrnNoteInline(admin.TabularInline):
@@ -84,6 +84,7 @@ class MaterialMasterAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(PaymentMethods)
+admin.site.register(InternalMaterial)
 admin.site.register(Warehouse)
 admin.site.register(MaterialMaster, MaterialMasterAdmin)
 admin.site.register(MaterialType)

@@ -44,10 +44,16 @@ MEASURE_UNITS = (
     ('Bottle','Bottle'),
 )
 
+class InternalMaterial(models.Model):
+    internalName = models.CharField(max_length=255, unique=True, null=False,blank=False,verbose_name='Internal Material Name')
+
+    def __str__(self):
+        return self.internalName
+
 
 class MaterialMaster(models.Model):
     name = models.CharField(max_length=255, unique=False, null=False,blank=False,verbose_name='Material Name')
-    internalName = models.CharField(max_length=255, unique=False, null=False,blank=False,verbose_name='Material Internal Name', help_text='i.e (milk, egg, chicken, tuna) in respective unit')
+    internalName = models.ForeignKey('InternalMaterial',models.DO_NOTHING,verbose_name='Material Internal Name', help_text='i.e (milk, egg, chicken, tuna) in respective unit')
     barcode = models.CharField(max_length=255,unique=True,blank=True,null=True, verbose_name='Barcode')
     warehouse = models.ForeignKey('Warehouse',models.DO_NOTHING, verbose_name='Where it Store / Warehouse',help_text='Where it is store, internaly after inward')
     type = models.ForeignKey('MaterialType', models.DO_NOTHING,null=False,verbose_name='Material Type',help_text='for example: Storing Tuna type is Meat, Seafood, and Poultry')
