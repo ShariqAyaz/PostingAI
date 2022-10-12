@@ -7,7 +7,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import GrnItemsDet, PaymentMethods, Warehouse, InternalMaterial, MaterialMaster, MaterialType, GrnNote, Store, StoreDet
+from .models import GrnItemsDet, PaymentMethods, Warehouse, InternalMaterial, MaterialMaster, MaterialType, GrnNote, Store, StoreDet, Products, Recipe, RecipeItems, ProcessedProduct, SaleProduction, SaleProcessedProduct, WastageProduct, WastageRawMaterial
 
 
 class GrnNoteInline(admin.TabularInline):
@@ -54,16 +54,19 @@ class GrnNoteAdmin(admin.ModelAdmin):
                     'itemName__unitSize',
                     'itemName__UOC'
                     ).filter(itemName=instance.itemName).first()
+
+                imObj = MaterialMaster.objects.filter(internalName=obj.get('itemName__internalName')).first()
                     
                 packing_of = obj.get('itemName__packingOf')
                 unitSize = obj.get('itemName__unitSize')
                 qty_each = packing_of * unitSize
+
                 if created:
-                    store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()    
-                    StoreDet.objects.create(doc=store_doc_id, itemName=instance.itemName, increase_qty=instance.iqty*qty_each, decrease_qty=0)
+                    store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()
+                    StoreDet.objects.create(doc=store_doc_id, itemName=imObj.internalName, increase_qty=instance.iqty*qty_each, decrease_qty=0)
                 else:
                     store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
-                    StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).update(increase_qty=instance.iqty*qty_each, decrease_qty=0)
+                    StoreDet.objects.filter(doc=store_doc_id, itemName=imObj.internalName).update(increase_qty=instance.iqty*qty_each, decrease_qty=0)
 
     @receiver(pre_delete)
     def post_handler(sender, instance=None, *args, **kwargs):
@@ -99,3 +102,11 @@ admin.site.register(GrnNote,GrnNoteAdmin)
 admin.site.register(GrnItemsDet, GrnDetAdmin)
 admin.site.register(Store, StoreAdmin)
 admin.site.register(StoreDet, StoreDetAdmin)
+admin.site.register(Products)
+admin.site.register(Recipe)
+admin.site.register(RecipeItems)
+admin.site.register(ProcessedProduct)
+admin.site.register(SaleProduction)
+admin.site.register(SaleProcessedProduct)
+admin.site.register(WastageProduct)
+admin.site.register(WastageRawMaterial)

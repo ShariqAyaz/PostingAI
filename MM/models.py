@@ -1,13 +1,7 @@
-from ast import AsyncFunctionDef
-from decimal import Decimal
-from email.policy import default
-from operator import mod
-from sqlite3 import Timestamp
-from tabnanny import verbose
-from unittest.util import _MAX_LENGTH
-from wsgiref.validate import validator
+from django.utils.timezone import now
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 
 ###############
 # Warehouse < #
@@ -16,6 +10,7 @@ WAREHOUSE_TYPES = (
     ('Frozen','Frozen'),
     ('Cold','Cold'),
     ('Dry','Dry'),
+    ('General','General'),
     ('Misc.','Misc.')
 )
 
@@ -106,10 +101,10 @@ class GrnNote(models.Model): # ref_doc_no = GRN
     invoiceNumber = models.CharField(max_length=50, verbose_name='Supplier / Vendor Invoice number')
     paymentMethod = models.ForeignKey('PaymentMethods', models.DO_NOTHING)
     vendorName = models.CharField(max_length=60, verbose_name='Supplier/Vendor Name')
-    date = models.DateTimeField(verbose_name="Date of Invoice")
+    date = models.DateTimeField(default=now, verbose_name="Date of Invoice")
     isPosted = models.BooleanField(default=True)
     note = models.CharField(max_length=100, blank=True, null=False, default='N/A')
-    time_stamp = models.DateTimeField(auto_now=True, verbose_name="Updated at")
+    time_stamp = models.DateTimeField(default=now, verbose_name="Updated at")
     
     def __init__(self, *args, **kwargs):
         super(GrnNote, self).__init__(*args, **kwargs)
@@ -143,7 +138,7 @@ REF_DOC_TYPE = (
 class Store(models.Model):
     ref_doc_no = models.IntegerField()
     docType = models.CharField(max_length=15, choices=REF_DOC_TYPE, unique=False, null=False)
-    doc_date = models.DateTimeField()
+    doc_date = models.DateTimeField(default=now)
 
     def __str__(self):
         return f"{self.ref_doc_no}"
@@ -154,7 +149,7 @@ class Store(models.Model):
 
 class StoreDet(models.Model):
     doc = models.ForeignKey(Store, models.DO_NOTHING)
-    itemName = models.ForeignKey('MaterialMaster', models.DO_NOTHING)
+    itemName = models.ForeignKey('InternalMaterial', models.DO_NOTHING)
     increase_qty = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
     decrease_qty = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
 
@@ -169,7 +164,7 @@ class StoreDet(models.Model):
 # Production Warehouse < #
 ##########################
 class Products(models.Model):
-    ProductNamePos = models.CharField(max_length=150, verbose_name='Product Name', choices=REF_DOC_TYPE, unique=True, null=False)
+    ProductNamePos = models.CharField(max_length=150, verbose_name='Product Name', unique=True, null=False)
     ProductIdPos = models.IntegerField(validators=[MinValueValidator(0)], verbose_name='ProductID from POS', help_text='Prodcut ID from POS to map')
     ProductPricePos = models.DecimalField(max_digits=18, verbose_name='Product Price', validators=[MinValueValidator(0.0)], decimal_places=4)
 
@@ -177,7 +172,7 @@ class Products(models.Model):
         return f"{self.ProductNamePos}"
 
 class Recipe(models.Model):
-    RecipeName = models.CharField(max_length=150, verbose_name='Product Name', choices=REF_DOC_TYPE, unique=True, null=False)
+    RecipeName = models.CharField(max_length=150, verbose_name='Product Name', unique=True, null=False)
     ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
     PreProcess = models.BooleanField(default=False, help_text='If item requires: Produce it first before SOLD, such as biryani then checked it. if it is produce on demand or sold as buy then unchecked it(such as redbull, Panini')
 
@@ -195,7 +190,7 @@ class RecipeItems(models.Model):
 class ProcessedProduct(models.Model): # ref_doc_no = PreProduction
     ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
     QuantityProcessed = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
-    dateofProcessed = models.DateTimeField(verbose_name="Date of Process")
+    dateofProcessed = models.DateTimeField(default=now,verbose_name="Date of Process")
 
     def __str__(self):
         return f"{self.ProductNamePos}"
@@ -203,7 +198,7 @@ class ProcessedProduct(models.Model): # ref_doc_no = PreProduction
 class SaleProduction(models.Model): # ref_doc_no = Production
     ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
     QuantitySale = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
-    dateofSale = models.DateTimeField(verbose_name="Date of Sale")
+    dateofSale = models.DateTimeField(default=now,verbose_name="Date of Sale")
 
     def __str__(self):
         return f"{self.ProductNamePos}"
@@ -211,7 +206,7 @@ class SaleProduction(models.Model): # ref_doc_no = Production
 class SaleProcessedProduct(models.Model): # not hit storedet
     ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
     QuantitySale = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
-    dateofSale = models.DateTimeField(verbose_name="Date of Sale")
+    dateofSale = models.DateTimeField(default=now,verbose_name="Date of Sale")
 
     def __str__(self):
         return f"{self.ProductNamePos}"
@@ -219,7 +214,7 @@ class SaleProcessedProduct(models.Model): # not hit storedet
 class WastageProduct(models.Model): # not hit storedet
     ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
     QuantityWastage = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
-    dateofWastage = models.DateTimeField(verbose_name="Date of Wastage")
+    dateofWastage = models.DateTimeField(default=now,verbose_name="Date of Wastage")
 
     def __str__(self):
         return f"{self.ProductNamePos}"
@@ -227,7 +222,7 @@ class WastageProduct(models.Model): # not hit storedet
 class WastageRawMaterial(models.Model): # ref_doc_no = WastageRaw
     itemName = models.ForeignKey('InternalMaterial', models.DO_NOTHING)
     QuantityWastage = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
-    dateofWastage = models.DateTimeField(verbose_name="Date of Wastage")
+    dateofWastage = models.DateTimeField(default=now,verbose_name="Date of Wastage")
 
     def __str__(self):
         return f"{self.itemName}"
