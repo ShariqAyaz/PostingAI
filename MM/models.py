@@ -1,5 +1,7 @@
+from ast import AsyncFunctionDef
 from decimal import Decimal
 from email.policy import default
+from operator import mod
 from sqlite3 import Timestamp
 from tabnanny import verbose
 from unittest.util import _MAX_LENGTH
@@ -100,7 +102,7 @@ class PaymentMethods(models.Model):
 #############################
 # GRN - Good Receipt Note < #
 #############################
-class GrnNote(models.Model):
+class GrnNote(models.Model): # ref_doc_no = GRN
     invoiceNumber = models.CharField(max_length=50, verbose_name='Supplier / Vendor Invoice number')
     paymentMethod = models.ForeignKey('PaymentMethods', models.DO_NOTHING)
     vendorName = models.CharField(max_length=60, verbose_name='Supplier/Vendor Name')
@@ -134,8 +136,9 @@ class GrnItemsDet(models.Model):
 REF_DOC_TYPE = (
     ('GRN','GRN'), # Apply when purchase, Increasing Stock
     ('Return','Return'), # Apply when returning to Supplier for any reason, Decrease Stock
-    ('Transfer','Transfer'), # Apply When Raw Material Issue to Production unit for process, Decrease Stock
-    ('Wastage','Wastage'),  # Apply When Raw Material got expire to be discard, Decrease Stock
+    ('PreProduction','PreProduction'), # Apply When Raw Material Issue to Production unit for process, Decrease Stock
+    ('Production','Production'), # Apply When Raw Material Issue to Production unit for Sale, Decrease Stock
+    ('WastageRaw','WastageRaw'),  # Apply When Raw Material got expire to be discard, Decrease Stock
 )
 class Store(models.Model):
     ref_doc_no = models.IntegerField()
@@ -161,3 +164,74 @@ class StoreDet(models.Model):
 ###########################
 # Store Stock Warehouse > #
 ###########################
+
+##########################
+# Production Warehouse < #
+##########################
+class Products(models.Model):
+    ProductNamePos = models.CharField(max_length=150, verbose_name='Product Name', choices=REF_DOC_TYPE, unique=True, null=False)
+    ProductIdPos = models.IntegerField(validators=[MinValueValidator(0)], verbose_name='ProductID from POS', help_text='Prodcut ID from POS to map')
+    ProductPricePos = models.DecimalField(max_digits=18, verbose_name='Product Price', validators=[MinValueValidator(0.0)], decimal_places=4)
+
+    def __str__(self):
+        return f"{self.ProductNamePos}"
+
+class Recipe(models.Model):
+    RecipeName = models.CharField(max_length=150, verbose_name='Product Name', choices=REF_DOC_TYPE, unique=True, null=False)
+    ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
+    PreProcess = models.BooleanField(default=False, help_text='If item requires: Produce it first before SOLD, such as biryani then checked it. if it is produce on demand or sold as buy then unchecked it(such as redbull, Panini')
+
+    def __str__(self):
+        return f"{self.RecipeName}"
+
+class RecipeItems(models.Model):
+    recipeId = models.ForeignKey('Recipe', models.DO_NOTHING)
+    itemName = models.ForeignKey('InternalMaterial', models.DO_NOTHING)
+    consQty = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+
+    def __str__(self):
+        return f"{self.recipeId}"
+
+class ProcessedProduct(models.Model): # ref_doc_no = PreProduction
+    ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
+    QuantityProcessed = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+    dateofProcessed = models.DateTimeField(verbose_name="Date of Process")
+
+    def __str__(self):
+        return f"{self.ProductNamePos}"
+
+class SaleProduction(models.Model): # ref_doc_no = Production
+    ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
+    QuantitySale = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+    dateofSale = models.DateTimeField(verbose_name="Date of Sale")
+
+    def __str__(self):
+        return f"{self.ProductNamePos}"
+
+class SaleProcessedProduct(models.Model): # not hit storedet
+    ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
+    QuantitySale = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+    dateofSale = models.DateTimeField(verbose_name="Date of Sale")
+
+    def __str__(self):
+        return f"{self.ProductNamePos}"
+
+class WastageProduct(models.Model): # not hit storedet
+    ProductNamePos = models.ForeignKey('Products', models.DO_NOTHING)
+    QuantityWastage = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+    dateofWastage = models.DateTimeField(verbose_name="Date of Wastage")
+
+    def __str__(self):
+        return f"{self.ProductNamePos}"
+
+class WastageRawMaterial(models.Model): # ref_doc_no = WastageRaw
+    itemName = models.ForeignKey('InternalMaterial', models.DO_NOTHING)
+    QuantityWastage = models.DecimalField(max_digits=18, validators=[MinValueValidator(0.0)], decimal_places=4)
+    dateofWastage = models.DateTimeField(verbose_name="Date of Wastage")
+
+    def __str__(self):
+        return f"{self.itemName}"
+
+##########################
+# Production Warehouse > #
+##########################

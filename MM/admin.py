@@ -47,7 +47,14 @@ class GrnNoteAdmin(admin.ModelAdmin):
                         pass
 
             if sender.__name__ == 'GrnItemsDet':
-                obj = sender.objects.select_related('itemName').values('itemName__UOP','itemName__internalName','itemName__packingOf','itemName__unitSize','itemName__UOC').filter(itemName=instance.itemName).first()
+                obj = sender.objects.select_related('itemName').values(
+                    'itemName__UOP',
+                    'itemName__internalName',
+                    'itemName__packingOf',
+                    'itemName__unitSize',
+                    'itemName__UOC'
+                    ).filter(itemName=instance.itemName).first()
+                    
                 packing_of = obj.get('itemName__packingOf')
                 unitSize = obj.get('itemName__unitSize')
                 qty_each = packing_of * unitSize
