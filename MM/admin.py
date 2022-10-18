@@ -98,12 +98,28 @@ class GrnNoteAdmin(admin.ModelAdmin):
 
     @receiver(pre_delete)
     def post_handler(sender, instance=None, *args, **kwargs):
+
         
         lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
         if sender.__name__ in lst_models:
+
+
+
             if sender.__name__ == 'GrnItemsDet':
+
+                obj = sender.objects.select_related('itemName').values(
+                'itemName__UOP',
+                'itemName__internalName',
+                'itemName__packingOf',
+                'itemName__unitSize',
+                'itemName__UOC'
+                ).filter(itemName=instance.itemName).first()
+
+                imObj = MaterialMaster.objects.filter(internalName=obj.get('itemName__internalName')).first()
+
                 store_doc_id = Store.objects.filter(ref_doc_no=str(instance.grn_no), docType='GRN').first()                    
-                StoreDet.objects.filter(doc=store_doc_id, itemName=instance.itemName).delete()
+                StoreDet.objects.filter(doc=store_doc_id, itemName=imObj.internalName).delete()
+
 
 class StoreDetAdmin(admin.ModelAdmin):
     list_display = (

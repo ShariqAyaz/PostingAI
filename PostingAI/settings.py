@@ -1,4 +1,5 @@
 
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'POS',
     'MM',
+    'django_crontab',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -41,6 +44,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'PostingAI.urls'
+
 
 TEMPLATES = [
     {
