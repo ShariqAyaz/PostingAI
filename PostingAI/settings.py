@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'POS',
     'MM',
-    'django_crontab',
 ]
+
 
 
 MIDDLEWARE = [
