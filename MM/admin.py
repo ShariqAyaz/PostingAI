@@ -49,9 +49,10 @@ class GrnDetAdmin(admin.ModelAdmin):
     )
 
     def Amount(self, obj):
-         JJ = jobs
-         JJ.Run.Run('asdfasd')
-         return 'obj.Amount'
+        JJ = jobs
+        JJ.Run.Run('asdfasd')
+        sumof = round(obj.irate*obj.iqty,2)
+        return f'{sumof}'
 
 class GrnNoteAdmin(admin.ModelAdmin):
     inlines = [
@@ -59,11 +60,10 @@ class GrnNoteAdmin(admin.ModelAdmin):
     ]
     list_display = ('invoiceNumber', 'vendorName', 'date', 'isPosted')
 
+
     @receiver(post_save)
     def post_handler(sender, created=False, deleted=False, instance=None, *args, **kwargs):
         
-        
-
         lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
 
         if sender.__name__ in lst_models:
