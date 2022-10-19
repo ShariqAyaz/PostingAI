@@ -7,6 +7,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import datetime, timedelta
+from jobs import jobs
 from POS.models import Menuitems, Recipeitems, Recipes, Inventoryitems, Inventorytransactiondocuments, Inventorytransactions, Menuitemportions, Menuitemprices
 from .models import GrnItemsDet, PaymentMethods, Warehouse, InternalMaterial, MaterialMaster, MaterialType, GrnNote, Store, StoreDet, Products, Recipe, RecipeItems, ProcessedProduct, SaleProduction, SaleProcessedProduct, WastageProduct, WastageRawMaterial
 
@@ -48,6 +49,8 @@ class GrnDetAdmin(admin.ModelAdmin):
     )
 
     def Amount(self, obj):
+         JJ = jobs
+         JJ.Run.Run('asdfasd')
          return 'obj.Amount'
 
 class GrnNoteAdmin(admin.ModelAdmin):
@@ -59,9 +62,12 @@ class GrnNoteAdmin(admin.ModelAdmin):
     @receiver(post_save)
     def post_handler(sender, created=False, deleted=False, instance=None, *args, **kwargs):
         
+        
+
         lst_models = ('GrnNote', 'GrnItemsDet', 'Store', 'StoreDet')
 
         if sender.__name__ in lst_models:
+            
             cur_grn_no = None
 
             if sender.__name__ == 'GrnNote':
