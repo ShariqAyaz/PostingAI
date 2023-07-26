@@ -7,7 +7,7 @@ from .models import Menuitems, Recipeitems, Recipes, Inventoryitems, Inventorytr
 
 class MultiDBModelAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
-    using = 'SambaPOS3'
+    using = 'SecondDB'
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.
@@ -33,7 +33,7 @@ class MultiDBModelAdmin(admin.ModelAdmin):
 
 
 class RecipeitemsAdminTab(admin.TabularInline):
-    using = 'SambaPOS3'
+    using = 'SecondDB'
     
 
     def get_queryset(self, request):
@@ -58,7 +58,7 @@ class RecipeitemsAdmin(RecipeitemsAdminTab):
 
 class RecipesAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
-    using = 'SambaPOS3'
+    using = 'SecondDB'
     inlines = [RecipeitemsAdmin,]
     save_as = True
     list_display = ['name','portion','fixedcost']

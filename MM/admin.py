@@ -14,7 +14,7 @@ from .models import GrnItemsDet, PaymentMethods, Warehouse, InternalMaterial, Ma
 
 class MultiDBModelAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
-    using = 'SambaPOS3'
+    using = 'SecondDB'
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.

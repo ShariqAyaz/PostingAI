@@ -78,9 +78,9 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '',
     },
-    'SambaPOS3': {
+    'SecondDB': {
         'ENGINE': 'mssql',
-        'NAME': 'SambaPOS3',
+        'NAME': 'SecondDB',
         'USER': 'sa',
         'PASSWORD': 'abc.123',
         'HOST': 'DESKTOP-7H23HPS\SQLEXPRESS',
