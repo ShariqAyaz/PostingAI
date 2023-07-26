@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('cardEnding', models.CharField(default='Cash', help_text='Ending 4 digit of card used or Cash etc...', max_length=50, unique=True, verbose_name='Card Number / Cash')),
-                ('name', models.CharField(default='Cash', help_text='i.e(Shariq Halifax, MPhenom NatWest, Rasa Cash, TripleOne Cash)', max_length=50, unique=True, verbose_name='Owner/Holder Name')),
+                ('name', models.CharField(default='Cash', help_text='i.e( Halifax, MPhenom NatWest, Rasa Cash, TripleOne Cash)', max_length=50, unique=True, verbose_name='Owner/Holder Name')),
             ],
         ),
         migrations.CreateModel(

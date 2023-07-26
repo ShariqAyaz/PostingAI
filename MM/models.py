@@ -1,3 +1,11 @@
+######################################################################################
+# Author: Muhammad Shariq Ayaz
+# Date: 2022
+# Description: Costing for RAW material towards finisehd goods and costing
+#
+# Multiple Databases integration with DJANGO APP
+######################################################################################
+
 from django.utils.timezone import now
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models

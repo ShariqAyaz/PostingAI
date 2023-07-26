@@ -1,3 +1,10 @@
+######################################################################################
+# Author: Muhammad Shariq Ayaz
+# Date: 2022
+# Description: Costing for RAW material towards finisehd goods and costing
+#
+# Multiple Databases integration including MSSQL(Microsoft SQL SERVER) with DJANGO APP
+######################################################################################
 
 import sys
 from pathlib import Path
@@ -74,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'PostAPI_DB',
         'USER': 'postgres',
-        'PASSWORD': 'abc.123',
+        'PASSWORD': 'abcde.123',
         'HOST': '127.0.0.1',
         'PORT': '',
     },
@@ -82,8 +89,8 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'SecondDB',
         'USER': 'sa',
-        'PASSWORD': 'abc.123',
-        'HOST': 'DESKTOP-7H23HPS\SQLEXPRESS',
+        'PASSWORD': 'abcde.123',
+        'HOST': 'DESKTOP-7HPS\SQLEXPRESS',
         'PORT': '1433',
         'Trusted_Connection':'no',
         'OPTIONS': {

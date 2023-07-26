@@ -1,4 +1,10 @@
-
+######################################################################################
+# Author: Muhammad Shariq Ayaz
+# Date: 2022
+# Description: Costing for RAW material towards finisehd goods and costing
+#
+# Multiple Databases integration including MSSQL(Microsoft SQL SERVER) with DJANGO APP
+######################################################################################
 from django.db import models
 
 

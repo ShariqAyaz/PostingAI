@@ -1,3 +1,11 @@
+######################################################################################
+# Author: Muhammad Shariq Ayaz
+# Date: 2022
+# Description: Costing for RAW material towards finisehd goods and costing
+#
+# Multiple Databases integration with DJANGO APP
+######################################################################################
+
 from decimal import Decimal
 import numbers
 from unicodedata import decimal
@@ -82,7 +90,7 @@ class GrnNoteAdmin(admin.ModelAdmin):
 
             if sender.__name__ == 'GrnItemsDet':
                 obj = sender.objects.select_related('itemName').values(
-                    'itemName__UOP',
+             hariq       'itemName__UOP',
                     'itemName__internalName',
                     'itemName__packingOf',
                     'itemName__unitSize',
